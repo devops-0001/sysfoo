@@ -1,34 +1,54 @@
 pipeline {
   agent any
-
-  tools{
-    maven 'Maven 3.6.3'  
-  }
-  
-  stages{
-      stage("build"){
-          steps{
-              echo 'building sysfoo app...'
-              sh 'mvn compile'
-          }
+  stages {
+    stage('build') {
+      steps {
+        echo 'building sysfoo app...'
+        sh 'mvn compile'
       }
-      stage("test"){
-          steps{
-              echo 'running unit tests'
-              sh 'mvn clean test'
-          }
-      }
-      stage("package"){
-          steps{
-              echo 'generating .war file'
-              sh 'mvn package -DskipTests'
-          }
-      }
-  }
-
-  post{
-    always{
-        echo 'This pipeline is completed..'
     }
+
+    stage('test') {
+      parallel {
+        stage('unit tests') {
+          steps {
+            echo 'running unit tests'
+            sh 'mvn clean test'
+          }
+        }
+
+        stage('integration tests') {
+          steps {
+            echo 'mock stage'
+            sleep 5
+          }
+        }
+
+        stage('SCA') {
+          steps {
+            sleep 8
+          }
+        }
+
+      }
+    }
+
+    stage('package') {
+      steps {
+        echo 'generating .war file'
+        sh 'mvn package -DskipTests'
+        archiveArtifacts '**/target/*.war'
+      }
+    }
+
+  }
+  tools {
+    maven 'Maven 3.6.3'
+  }
+  post {
+    always {
+      echo 'This pipeline is completed..'
+    }
+
   }
 }
