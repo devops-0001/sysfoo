@@ -34,10 +34,21 @@ pipeline {
     }
 
     stage('package') {
-      steps {
-        echo 'generating .war file'
-        sh 'mvn package -DskipTests'
-        archiveArtifacts '**/target/*.war'
+      parallel {
+        stage('package') {
+          steps {
+            echo 'generating .war file'
+            sh 'mvn package -DskipTests'
+            archiveArtifacts '**/target/*.war'
+          }
+        }
+
+        stage('pkg2') {
+          steps {
+            sleep 6
+          }
+        }
+
       }
     }
 
