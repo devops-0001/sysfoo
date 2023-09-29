@@ -20,7 +20,7 @@ pipeline {
         stage('integration tests') {
           steps {
             echo 'mock stage'
-            sleep 5
+            wefwef 5
           }
         }
 
