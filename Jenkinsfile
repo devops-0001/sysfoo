@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'maven:3.6.3-jdk-11-slim'
+    }
+
+  }
   stages {
     stage('build') {
       steps {
@@ -8,47 +13,18 @@ pipeline {
       }
     }
 
-    stage('test') {
-      parallel {
-        stage('unit tests') {
-          steps {
-            echo 'running unit tests'
-            sh 'mvn clean test'
-          }
-        }
-
-        stage('integration tests') {
-          steps {
-            echo 'mock stage'
-            sleep 5
-          }
-        }
-
-        stage('SCA') {
-          steps {
-            sleep 8
-          }
-        }
-
+    stage('unit tests') {
+      steps {
+        echo 'running unit tests'
+        sh 'mvn clean test'
       }
     }
 
     stage('package') {
-      parallel {
-        stage('package') {
-          steps {
-            echo 'generating .war file'
-            sh 'mvn package -DskipTests'
-            archiveArtifacts '**/target/*.war'
-          }
-        }
-
-        stage('pkg2') {
-          steps {
-            sleep 6
-          }
-        }
-
+      steps {
+        echo 'generating .war file'
+        sh 'mvn package -DskipTests'
+        archiveArtifacts '**/target/*.war'
       }
     }
 
