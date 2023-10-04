@@ -30,12 +30,14 @@ pipeline {
     stage('package') {
       parallel {
         stage('package') {
-          when { branch 'master' }
           agent {
             docker {
               image 'maven:3.6.3-jdk-11-slim'
             }
 
+          }
+          when {
+            branch 'master'
           }
           steps {
             echo 'generating .war file'
@@ -46,8 +48,9 @@ pipeline {
 
         stage('Docker B&P') {
           agent any
-          when { branch 'master' }
-
+          when {
+            branch 'master'
+          }
           steps {
             script {
               docker.withRegistry('https://index.docker.io/v1/', 'dockerlogin') {
@@ -61,14 +64,6 @@ pipeline {
           }
         }
 
-      }
-    }
-
-    stage('Deploy to Dev') {
-      agent any
-      when { branch 'master' }
-      steps {
-        sh 'docker-compose up -d '
       }
     }
 
