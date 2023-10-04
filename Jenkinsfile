@@ -66,6 +66,7 @@ pipeline {
 
     stage('Deploy to Dev') {
       agent any
+      when { branch 'master' }
       steps {
         sh 'docker-compose up -d '
       }
